@@ -1,35 +1,40 @@
 import { unstable_cache } from "next/cache";
 
+// Enable ISR with lazy generation
+export const dynamic = "force-static";
+export const dynamicParams = true;
+export const revalidate = 3600; // 1 hour
+
+// Return empty array to enable lazy ISR (pages generated on first request)
+export function generateStaticParams() {
+  return [];
+}
+
 // Simulate slow data fetching with unstable_cache
 async function getBlogPost(id: string) {
-  return unstable_cache(
-    async () => {
-      const startTime = Date.now();
-      console.log(`[${new Date().toISOString()}] Starting to fetch blog post: ${id}`);
+  const startTime = Date.now();
+  console.log(
+    `[${new Date().toISOString()}] Starting to fetch blog post: ${id}`
+  );
 
-      // Artificial 10-second delay
-      await new Promise((resolve) => setTimeout(resolve, 10000));
+  // Artificial 10-second delay
+  await new Promise((resolve) => setTimeout(resolve, 10000));
 
-      const endTime = Date.now();
-      const generationTime = (endTime - startTime) / 1000;
+  const endTime = Date.now();
+  const generationTime = (endTime - startTime) / 1000;
 
-      console.log(`[${new Date().toISOString()}] Finished fetching blog post: ${id} (${generationTime}s)`);
+  console.log(
+    `[${new Date().toISOString()}] Finished fetching blog post: ${id} (${generationTime}s)`
+  );
 
-      return {
-        id,
-        title: `Blog Post: ${id}`,
-        content: `This is a blog post with unstable_cache enabled. It took ${generationTime} seconds to generate.`,
-        generatedAt: new Date().toISOString(),
-        generationTime,
-        requestId: Math.random().toString(36).substring(7),
-      };
-    },
-    [`blog-post-${id}`],
-    {
-      tags: [`blog-${id}`],
-      revalidate: 3600, // 1 hour
-    }
-  )();
+  return {
+    id,
+    title: `Blog Post: ${id}`,
+    content: `This is a blog post with unstable_cache enabled. It took ${generationTime} seconds to generate.`,
+    generatedAt: new Date().toISOString(),
+    generationTime,
+    requestId: Math.random().toString(36).substring(7),
+  };
 }
 
 export default async function BlogPost({
@@ -83,7 +88,15 @@ export default async function BlogPost({
 
           <div className="p-4 bg-amber-50 dark:bg-amber-900/20 rounded">
             <p className="text-sm text-amber-900 dark:text-amber-300">
-              <strong>Cache Config:</strong> Using unstable_cache with 1 hour revalidation
+              <strong>Cache Config:</strong> ISR with lazy generation +
+              unstable_cache (1 hour revalidation)
+            </p>
+          </div>
+
+          <div className="p-4 bg-slate-50 dark:bg-slate-900/20 rounded border border-slate-200 dark:border-slate-800">
+            <p className="text-xs text-slate-700 dark:text-slate-400">
+              <strong>ISR Mode:</strong> force-static with dynamicParams=true
+              and empty generateStaticParams() for lazy generation
             </p>
           </div>
         </div>

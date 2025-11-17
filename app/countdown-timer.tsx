@@ -67,9 +67,7 @@ export default function CountdownTimer({ blogId }: CountdownTimerProps) {
       console.log("Manual prefetch triggered at", new Date().toISOString());
       console.log("Prefetching blog ID (Test 1):", blogId1);
       // Explicitly trigger prefetch
-      router.prefetch(`/blog/${blogId1}`, {
-        kind: PrefetchKind.FULL,
-      });
+      router.prefetch(`/blog/${blogId1}`);
     }
   };
 
